@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>MUHBİR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+  :root { --red:#b3131a; --ink:#e8e2d2; --dim:#9a9486; --bg:#08080a; --mono:"Courier New", ui-monospace, Menlo, monospace; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:var(--mono); overflow:hidden; overscroll-behavior:none; touch-action:none; user-select:none; -webkit-user-select:none; }
+  #c { position:fixed; inset:0; width:100%; height:100%; display:block; }
+  .layer { position:fixed; inset:0; pointer-events:none; }
+  button { font-family:var(--mono); color:var(--ink); background:rgba(12,12,14,.82); border:1px solid #4a463c; padding:11px 16px; font-size:15px; font-weight:700; letter-spacing:.06em; cursor:pointer; pointer-events:auto; text-transform:uppercase; border-radius:2px; transition:transform .12s ease-out, background .12s, border-color .12s; }
+  button:hover { border-color:var(--ink); background:rgba(30,28,26,.9); }
+  button:active { transform:scale(.96); }
+  button.red { border-color:var(--red); background:rgba(120,14,20,.82); }
+  button.red:hover { background:rgba(160,18,26,.92); }
+  button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  kbd { font-family:var(--mono); border:1px solid #6a665a; padding:0 5px; font-size:12px; margin-left:8px; color:var(--dim); border-radius:2px; }
+
+  /* menü */
+  /* Açılış ekranı: polis dosyası. Solda dosya sayfası (şüpheliler), sağda dosya sekmeleri (eylemler). */
+  #menu { display:flex; flex-direction:column; align-items:center; justify-content:safe center; pointer-events:auto; overflow-y:auto; padding:14px; box-sizing:border-box; background:radial-gradient(ellipse at 40% 30%,#3b2a1c,#120c07 80%); }
+  #menu .desk { position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; width:min(1120px,100%); }
+  #menu .page { position:relative; background:#f1ead8; color:#2a2118; padding:clamp(14px,2.6vw,34px) clamp(16px,3vw,40px); box-shadow:0 0 0 clamp(6px,1vw,14px) #d9c28f, 0 24px 60px #000; transform:rotate(-.5deg); text-align:left; min-width:0; margin:clamp(6px,1vw,14px); }
+  #menu .clip { position:absolute; left:64%; top:-22px; width:26px; height:64px; border:4px solid #9aa0a6; border-radius:14px; transform:rotate(6deg); box-shadow:1px 2px 3px rgba(0,0,0,.4); }
+  #menu .stamp { position:absolute; right:clamp(10px,3vw,40px); top:clamp(8px,2vw,26px); border:3px solid #a3161c; color:#a3161c; font-weight:700; letter-spacing:.16em; font-size:clamp(13px,2vw,26px); padding:3px 10px; transform:rotate(9deg); opacity:.8; }
+  #menu h1 { font-size:clamp(34px,6.4vw,74px); margin:0; letter-spacing:.2em; line-height:1; color:#2a2118; }
+  #menu h1 span { color:#a3161c; }
+  #menu .kicker { font-size:clamp(8.5px,1.15vw,13px); letter-spacing:.1em; margin:6px 0 0; padding-bottom:8px; border-bottom:2px solid #2a2118; }
+  #menu .mugs { display:grid; grid-template-columns:repeat(6,1fr); gap:clamp(6px,1.2vw,16px); margin-top:clamp(10px,1.8vw,22px); }
+  #menu .mug { all:unset; cursor:pointer; text-align:center; font-size:clamp(9px,1.1vw,13px); font-weight:700; letter-spacing:.06em; color:#2a2118; }
+  #menu .mug img { display:block; width:100%; aspect-ratio:1; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.4); filter:sepia(.25) contrast(1.1); margin-bottom:5px; box-sizing:border-box; }
+  #menu .mug:nth-child(odd) img { transform:rotate(-2deg); } #menu .mug:nth-child(even) img { transform:rotate(1.5deg); }
+  #menu .mug.on img { border-color:#a3161c; box-shadow:0 0 0 2px #a3161c, 0 2px 6px rgba(0,0,0,.4); } #menu .mug.on { color:#a3161c; }
+  #menu .mug:focus-visible img { outline:3px solid #2a2118; outline-offset:2px; }
+  #menu .minfo { margin-top:clamp(8px,1.2vw,14px); font-size:clamp(10.5px,1.2vw,14px); line-height:1.45; min-height:2.9em; }
+  #menu .minfo b { color:#a3161c; }
+  #menu .tag { margin-top:clamp(8px,1.2vw,14px); padding-top:8px; border-top:1px dashed #2a2118; font-size:clamp(10px,1.15vw,13.5px); line-height:1.45; color:#2a2118; max-width:none; }
+  #menu .daily { display:block; margin-top:4px; font-size:clamp(10px,1.15vw,13.5px); color:#7a1016; font-weight:700; }
+  #menu .daily.done { color:#6b6253; font-weight:400; }
+  #menu .opts { display:grid; grid-template-columns:repeat(4,1fr); gap:8px 12px; margin-top:clamp(8px,1.4vw,16px); }
+  #menu .opts label { display:flex; flex-direction:column; gap:2px; color:#6b6253; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; }
+  #menu select { font-family:var(--mono); width:100%; background:transparent; color:#2a2118; border:0; border-bottom:2px dotted #2a2118; border-radius:0; padding:5px 2px; font-size:13px; font-weight:700; min-height:32px; }
+  #menu select:focus-visible { outline:2px solid #a3161c; }
+  #menu .tabs { display:flex; flex-direction:column; gap:clamp(6px,1vw,12px); padding-top:clamp(10px,2vw,30px); margin-left:clamp(6px,1vw,14px); }
+  #menu .tabs button { all:unset; box-sizing:border-box; cursor:pointer; width:clamp(150px,20vw,236px); min-height:44px; padding:clamp(9px,1.3vw,16px) 14px; background:#d9c28f; color:#2a2118; border-radius:0 10px 10px 0; font-weight:700; font-size:clamp(12px,1.35vw,17px); letter-spacing:.1em; text-transform:uppercase; box-shadow:4px 4px 10px rgba(0,0,0,.5); transition:transform .15s ease-out; }
+  #menu .tabs button small { display:block; font-weight:400; font-size:clamp(9.5px,.95vw,12px); letter-spacing:.02em; text-transform:none; margin-top:2px; }
+  #menu .tabs button:hover, #menu .tabs button:focus-visible { transform:translateX(6px); } #menu .tabs button:focus-visible { outline:2px solid #fff; } #menu .tabs button:active { transform:translateX(2px); }
+  #menu .tabs #play { background:#8a1c1c; color:#f3ecd9; width:clamp(166px,22vw,262px); font-size:clamp(14px,1.6vw,21px); padding-top:clamp(12px,1.7vw,22px); padding-bottom:clamp(12px,1.7vw,22px); }
+  #menu .links { display:flex; flex-wrap:wrap; gap:2px 12px; margin-top:6px; }
+  #menu .links button { all:unset; cursor:pointer; color:#cbbf9f; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; padding:8px 2px; width:auto; min-height:0; background:none; box-shadow:none; }
+  #menu .links button:hover, #menu .links button:focus-visible { color:#fff; transform:none; }
+  #menu #stats { color:#a89c80 !important; margin-top:10px; } #menu #loading { color:#f1ead8; }
+  @media (max-width:700px) and (orientation:portrait) { #menu .desk { grid-template-columns:1fr; } #menu .mugs { grid-template-columns:repeat(3,1fr); } #menu .opts { grid-template-columns:repeat(2,1fr); } #menu .tabs { display:grid; grid-template-columns:1fr 1fr; margin:16px 0 0; padding:0; } #menu .tabs button, #menu .tabs #play { width:auto; border-radius:8px; } #menu .tabs #play, #menu .links { grid-column:1 / -1; } #menu .mug { font-size:11px; } #menu .minfo { font-size:12px; } #menu .tag { display:none; } #menu .mugs { gap:4px 10px; padding:0 16%; } #menu .tabs { margin-top:10px; gap:6px; } #menu .tabs button small { display:none; } }
+  @media (max-height:460px) { #menu { padding:8px 10px; } #menu .tag { display:none; } #menu .page { padding:10px 16px; } #menu .mugs { gap:8px; margin-top:8px; max-width:440px; } #menu .mug { font-size:9px; } #menu .minfo { font-size:10.5px; min-height:2.8em; margin-top:5px; } #menu .opts { margin-top:5px; } #menu select { min-height:26px; padding:2px; font-size:12px; } #menu .tabs { gap:5px; padding-top:4px; } #menu .tabs button { min-height:0; padding:7px 12px; } #menu .tabs #play { padding:9px 12px; } #menu .tabs button small { display:none; } #menu .tabs button { padding:6px 12px; } #menu .links button { padding:4px 2px; font-size:10.5px; } #menu #stats { display:none; } }
+  @media (prefers-reduced-motion: reduce) { #menu .tabs button { transition:none; } }
+  #play { font-size:20px; padding:16px 44px; }
+  #how { max-width:560px; text-align:left; color:var(--dim); font-size:13.5px; line-height:1.6; border-top:1px solid #2a2824; padding-top:14px; }
+  #how b { color:var(--ink); }
+  #loading { color:var(--dim); font-size:14px; min-height:20px; }
+  #prep { position:fixed; inset:0; z-index:60; display:none; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:24px; background:radial-gradient(ellipse at 50% 38%, #1b1612 0%, #0a0807 62%, #050404 100%); color:#efe6d2; text-align:center; transition:opacity .45s ease-out; }
+  #prep.out { opacity:0; pointer-events:none; }
+  #prep .lamp { width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, rgba(232,196,106,.34) 0%, rgba(232,196,106,.08) 42%, transparent 70%); position:relative; animation:prepSway 3.6s ease-in-out infinite; }
+  #prep .deck { position:absolute; left:50%; top:54%; width:34px; height:48px; margin:-24px 0 0 -17px; }
+  #prep .deck i { position:absolute; inset:0; border-radius:4px; background:#efe6d2; border:1px solid #1a1612; box-shadow:0 2px 6px rgba(0,0,0,.5); animation:prepDeal 1.5s cubic-bezier(.3,.7,.3,1) infinite; }
+  #prep .deck i:nth-child(2) { animation-delay:.25s; } #prep .deck i:nth-child(3) { animation-delay:.5s; background:#8a1c1c; }
+  #prep b { font:700 20px/1.2 inherit; letter-spacing:.14em; text-transform:uppercase; }
+  #prep .bar { width:min(280px,70vw); height:4px; border-radius:2px; background:rgba(239,230,210,.14); overflow:hidden; }
+  #prep .bar i { display:block; height:100%; width:4%; background:#e8c46a; border-radius:2px; transition:width .35s ease-out; }
+  #prep small { color:#a89c80; font-size:13px; line-height:1.5; max-width:min(360px,84vw); min-height:40px; }
+  @keyframes prepDeal { 0% { transform:translate(0,0) rotate(0); opacity:1; } 60% { transform:translate(var(--dx,46px),10px) rotate(14deg); opacity:1; } 100% { transform:translate(var(--dx,46px),10px) rotate(14deg); opacity:0; } }
+  #prep .deck i:nth-child(2) { --dx:-46px; } #prep .deck i:nth-child(3) { --dx:0px; }
+  @keyframes prepSway { 0%,100% { transform:rotate(-2deg); } 50% { transform:rotate(2deg); } }
+  @media (prefers-reduced-motion: reduce) { #prep .lamp, #prep .deck i { animation:none; } }
+
+  /* HUD */
+  #hud { display:none; }
+  .tlog { max-width:min(460px,88vw); margin:8px auto; text-align:left; font-size:12.5px; line-height:1.5; } .tlog summary { cursor:pointer; padding:8px 0; color:#e8c46a; } .tlog p { margin:0; opacity:.85; } .tlog p.h { margin-top:6px; opacity:1; font-weight:700; } .tlog p.hot { color:#ff8b8b; opacity:1; }
+  .moment { margin:10px auto 2px; max-width:min(420px,86vw); } .moment img { width:100%; border-radius:8px; display:block; border:1px solid rgba(255,255,255,.15); } .moment figcaption { font-size:12px; margin:6px 0; opacity:.85; } .moment button { font-size:12px; padding:8px 14px; }
+  #campBody { font-size:13px; line-height:1.5; } #campBody b { display:block; margin:10px 0 4px; letter-spacing:.08em; } #campBody p { margin:4px 0; } #campBody .clue { color:#e8c46a; }
+  .nights { list-style:none; padding:0; margin:8px 0; display:grid; gap:2px; font-size:12px; } .nights li { opacity:.45; } .nights li.done { opacity:.8; text-decoration:line-through; } .nights li.cur { opacity:1; color:#fff; }
+  #night { position:absolute; left:50%; top:26%; transform:translate(-50%,-50%) rotate(-2deg) scale(.8); width:min(300px,70vw); background:#efe6d2; color:#1a1612; border-radius:10px; padding:14px 16px 16px; text-align:center; box-shadow:0 18px 50px rgba(0,0,0,.7); opacity:0; pointer-events:none; transition:opacity .25s, transform .35s cubic-bezier(.34,1.56,.64,1); z-index:6; }
+  #night.show { opacity:1; transform:translate(-50%,-50%) rotate(-2deg) scale(1); }
+  #night.kind { width:min(360px,80vw); top:30%; } #night.kind b { font-size:20px; } #night.kind span { display:block; text-align:left; font-size:12.5px; } #night.kind i { font-style:normal; font-weight:700; color:#8a1c1c; }
+  #cJacket { display:grid; grid-template-columns:1fr 1fr; gap:6px; } #cJacket .kc { all:unset; box-sizing:border-box; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-start; padding:8px 10px; border:1px solid #3a3632; border-radius:8px; font-size:11.5px; line-height:1.4; } #cJacket .kc b { display:block; font-size:13px; letter-spacing:.06em; margin-bottom:2px; } #cJacket .kc span { display:block; } #cJacket .kc .z { opacity:.7; } #cJacket .kc.on { border-color:var(--red); background:rgba(179,19,26,.14); } #cJacket .kc:focus-visible { outline:2px solid #fff; }
+  @media (max-width:520px) { #cJacket { grid-template-columns:1fr; } }
+  @media (min-width:700px) { #night.kind.side { left:24%; top:40%; } }
+  #night .pactB { pointer-events:auto; display:block; margin:10px auto 0; padding:9px 14px; min-height:40px; background:#1a1612; color:#efe6d2; border:0; border-radius:6px; font:700 13px/1 inherit; letter-spacing:.04em; cursor:pointer; } #night .pactB:hover { background:#8a1c1c; }
+  #night small { display:block; letter-spacing:.3em; font-size:10px; color:#8a1c1c; margin-bottom:6px; }
+  #night b { display:block; font-size:24px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+  #night span { font-size:13px; line-height:1.4; }
+  @media (prefers-reduced-motion: reduce) { #night { transition:opacity .2s; } }
+  #status { position:absolute; left:12px; top:54px; width:max-content; max-width:min(60vw,330px); background:rgba(10,10,12,.5); border:1px solid rgba(255,255,255,.08); border-radius:9px; padding:3px 5px; pointer-events:auto; font-variant-numeric:tabular-nums; }
+  #status .row { display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+  #status .h { color:var(--red); letter-spacing:.14em; font-size:14px; line-height:1; padding:0 6px 0 4px; }
+  #status .h i { color:#3a3632; font-style:normal; }
+  #status .it { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:4px; padding:0 7px; border-radius:6px; cursor:pointer; min-height:30px; min-width:30px; color:var(--ink); }
+  #status .it svg { width:14px; height:14px; flex:none; opacity:.85; }
+  #status .it b { font-size:12.5px; }
+  #status .it.zero { opacity:.45; }
+  #status .it.on { background:rgba(255,255,255,.1); outline:1px solid var(--red); opacity:1; }
+  #status .it:focus-visible { outline:2px solid #fff; }
+  #status .mn b { color:#e8c46a; }
+  #status .kz b { font-size:11.5px; color:#f0d9a0; white-space:nowrap; }
+  #status .tip { margin:3px 2px 4px; padding-top:5px; border-top:1px solid rgba(255,255,255,.1); font-size:11.5px; line-height:1.4; max-width:250px; }
+  #status .tip b { color:#e8c46a; }
+  @media (max-height:480px), (max-width:700px) { #status { top:50px; } }
+  #pStory .box p { margin:0; line-height:1.55; color:#cfc9bf; }
+  #pStory .box p b { color:var(--ink); }
+  #pStory .date { color:var(--red); letter-spacing:.2em; font-size:12px; }
+  #bet { position:absolute; left:50%; top:54px; transform:translateX(-50%); display:none; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; background:rgba(10,10,12,.78); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 10px; pointer-events:auto; font-size:12.5px; max-width:92vw; z-index:5; }
+  #bet button { padding:7px 12px; font-size:12.5px; }
+  .shop { display:flex; flex-direction:column; gap:8px; max-height:52vh; overflow:auto; width:100%; }
+  .shop .row { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.04); border-radius:8px; padding:10px 12px; text-align:left; }
+  .shop .row div { flex:1; } .shop .row b { display:block; font-size:14px; } .shop .row small { color:#a89c80; font-size:12px; line-height:1.4; }
+  .shop .row button { min-width:96px; min-height:38px; } .shop .row.on { outline:1px solid #e8c46a; }
+  #legend { position:fixed; left:50%; top:40%; transform:translate(-50%,-50%) rotate(-8deg) scale(1.6); opacity:0; pointer-events:none; z-index:40; border:6px double #e8c46a; color:#e8c46a; padding:14px 28px; border-radius:10px; text-align:center; background:rgba(20,12,4,.78); transition:opacity .25s, transform .45s cubic-bezier(.3,1.6,.5,1); }
+  #legend.show { opacity:1; transform:translate(-50%,-50%) rotate(-8deg) scale(1); }
+  #legend small { display:block; letter-spacing:.3em; font-size:13px; } #legend b { display:block; font-size:34px; letter-spacing:.06em; } #legend span { display:block; font-size:13px; color:#efe6d2; margin-top:4px; }
+  .news { margin:10px auto; max-width:360px; } .news img { width:100%; border-radius:4px; box-shadow:0 6px 24px rgba(0,0,0,.6); } .news button { margin-top:6px; }
+  .quest { color:#e8c46a; }
+  #ghost { position:absolute; left:50%; bottom:96px; transform:translateX(-50%); display:none; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; background:rgba(16,22,30,.82); border:1px solid rgba(160,190,230,.35); border-radius:10px; padding:8px 10px; color:#cfe0ff; z-index:6; max-width:92vw; }
+  #votes { position:absolute; right:12px; top:96px; display:none; background:rgba(10,10,12,.72); color:#e8c46a; font-size:12px; padding:6px 10px; border-radius:8px; max-width:44vw; }
+  #talk { position:absolute; right:12px; bottom:100px; min-height:42px; padding:8px 14px; border-radius:21px; z-index:6; } #talk.on { background:#8a1c1c; color:#fff; }
+  #ghost span { font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:12px; margin-right:4px; }
+  #ghost button { padding:8px 12px; font-size:12.5px; min-height:36px; }
+  #bet .stake { background:#3a2c10; color:#ffd870; }
+  #trig { position:absolute; left:50%; bottom:92px; transform:translateX(-50%); width:118px; height:118px; display:none; flex-direction:column; align-items:center; justify-content:center; border-radius:50%; background:rgba(40,8,8,.72); color:#f5e6d0; user-select:none; touch-action:none; cursor:pointer; z-index:7; }
+  #trig svg { position:absolute; inset:4px; width:110px; height:110px; transform:rotate(-90deg); pointer-events:none; }
+  #trig circle { fill:none; stroke-width:6; } #trig circle.b { stroke:rgba(255,255,255,.14); } #trig circle.p { stroke:#e04030; stroke-dasharray:302; stroke-dashoffset:302; stroke-linecap:round; }
+  #trig b { font-size:17px; letter-spacing:.14em; } #trig small { font-size:11px; color:#c8b8a0; }
+  #trig.done { background:rgba(120,14,10,.9); }
+  #round { position:absolute; right:14px; top:12px; font-size:12.5px; color:var(--dim); text-align:right; line-height:1.6; background:rgba(8,8,10,.45); padding:6px 10px; }
+  #round b { color:var(--ink); }
+  #bottom { z-index:3; position:absolute; left:50%; bottom:16px; transform:translateX(-50%); width:min(96vw, 680px); display:flex; flex-direction:column; align-items:center; gap:12px; }
+  #prompt { font-size:16px; text-align:center; text-shadow:0 2px 8px #000, 0 0 2px #000; line-height:1.4; text-wrap:balance; }
+  #actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  #subs { position:absolute; left:50%; top:16%; transform:translateX(-50%); font-size:16px; text-align:center; max-width:min(90vw,600px); text-shadow:0 2px 8px #000, 0 0 3px #000; opacity:0; transition:opacity .25s; line-height:1.4; }
+  #subs b { color:var(--red); }
+  #toast { position:absolute; left:50%; top:34%; transform:translate(-50%,-50%); font-size:clamp(20px,4.4vw,34px); font-weight:700; letter-spacing:.08em; text-align:center; text-shadow:0 2px 14px #000, 0 0 4px #000; opacity:0; max-width:92vw; text-wrap:balance; }
+  #toast.show { animation:pop 2.4s cubic-bezier(.2,.9,.3,1) forwards; }
+  #toast.red { color:#ff4a50; }
+  @keyframes pop { 0%{opacity:0; transform:translate(-50%,-50%) scale(1.25,.8);} 8%{opacity:1; transform:translate(-50%,-50%) scale(1);} 80%{opacity:1;} 100%{opacity:0; transform:translate(-50%,-56%) scale(1);} }
+  .tag3d { pointer-events:auto; cursor:pointer; position:absolute; transform:translate(-50%,-100%); font-size:12px; text-align:center; white-space:nowrap; text-shadow:0 1px 5px #000, 0 0 2px #000; line-height:1.35; transition:opacity .2s; }
+  .tag3d .n { font-weight:700; letter-spacing:.14em; }
+  .tag3d .h { color:var(--red); letter-spacing:.15em; } .tag3d .h i { color:#3a3632; font-style:normal; }
+  .tag3d .s { color:var(--dim); font-variant-numeric:tabular-nums; }
+  .tag3d.turn .n { color:#ffd9a0; }
+  .tag3d.dead { opacity:.35; }
+  #prompt.tut { font-size:clamp(17px,2.6vw,23px); background:rgba(6,6,8,.72); padding:12px 18px; border-left:3px solid var(--red); text-align:left; max-width:min(94vw,640px); }
+  #hud.tut #status, #hud.tut #round, #hud.tut #top { display:none; }
+  #ff { display:none; align-items:center; justify-content:center; background:#000; pointer-events:auto; z-index:30; color:var(--dim); font-size:15px; }
+  #prompt:empty { display:none; }
+  .lb { position:fixed; left:0; right:0; height:0; background:#000; transition:height .5s cubic-bezier(.2,.8,.2,1); pointer-events:none; z-index:2; } #lbT { top:0; } #lbB { bottom:0; }
+  body.cine .lb { height:7vh; } body.cine #top, body.cine #status, body.cine #round { opacity:0; transition:opacity .3s; }
+  @media (prefers-reduced-motion: reduce) { .lb { transition:none; } }
+
+  .panel { display:none; align-items:center; justify-content:center; background:rgba(3,3,4,.82); pointer-events:auto; padding:16px; z-index:25; }
+  .panel .box { width:min(94vw,470px); max-height:90vh; overflow:auto; background:#0e0e10; border:1px solid #3a3632; padding:18px 20px; display:flex; flex-direction:column; gap:12px; font-size:14px; text-align:left; }
+  .panel .box > b { letter-spacing:.14em; }
+  .panel label { display:flex; justify-content:space-between; align-items:center; gap:12px; color:var(--dim); }
+  .panel input[type=range] { width:55%; accent-color:var(--red); pointer-events:auto; }
+  .panel select, .panel input[type=text] { font-family:var(--mono); background:#111; color:var(--ink); border:1px solid #4a463c; padding:9px; font-size:14px; pointer-events:auto; min-width:0; }
+  .panel .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .dim { color:var(--dim); font-size:13px; line-height:1.5; margin:0; }
+  .sw { display:flex; gap:10px; flex-wrap:wrap; } .sw button.txt { width:auto; height:auto; padding:9px 12px; border-radius:8px; font-size:12.5px; } .sw button { width:44px; height:44px; padding:0; border-radius:50%; } .sw button.on { outline:2px solid var(--ink); outline-offset:3px; } .sw button.lock { opacity:.25; }
+  #oList { margin:0; padding-left:22px; line-height:1.8; } #oTitle { font-size:24px; letter-spacing:.3em; font-weight:700; }
+  #oCode { width:110px; text-transform:uppercase; letter-spacing:.3em; }
+  #timer { position:absolute; left:50%; top:12px; width:min(42vw,300px); height:5px; transform:translateX(-50%); background:rgba(232,226,210,.15); display:none; }
+  #timer i { display:block; height:100%; width:100%; background:var(--ink); transform-origin:left; } #timer.low i { background:#ff4a50; }
+  #emo { position:absolute; left:12px; top:54px; display:none; flex-direction:column; gap:6px; z-index:6; background:rgba(8,8,10,.8); padding:8px; } #emo button { padding:9px 11px; font-size:12px; text-align:left; }
+  #menu.live { background:rgba(4,4,5,.72); }
+  #overX { font-size:14px; line-height:1.7; max-width:480px; } #overX b { color:#ffd9a0; }
+  #profBody { line-height:1.75; color:var(--dim); } #profBody b { color:var(--ink); } #profBody .got { color:var(--ink); } #profBody .bar { height:6px; background:#2a2824; } #profBody .bar i { display:block; height:100%; background:var(--red); }
+  #actions button.sel, button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  #market { position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); width:min(94vw,440px); display:none; flex-direction:column; gap:8px; background:rgba(10,10,12,.92); border:1px solid #3a3632; padding:14px 16px; pointer-events:auto; z-index:5; }
+  #market .t { display:flex; justify-content:space-between; font-weight:700; letter-spacing:.12em; } #market .t span { color:#ffd9a0; font-variant-numeric:tabular-nums; }
+  #market .it { display:flex; justify-content:space-between; align-items:center; gap:10px; text-align:left; text-transform:none; letter-spacing:0; font-weight:400; font-size:13.5px; padding:9px 11px; }
+  #market .it b { text-transform:uppercase; letter-spacing:.05em; } #market .it i { font-style:normal; color:var(--dim); } #market .it u { text-decoration:none; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  #market .it:disabled { opacity:.35; cursor:default; }
+  #cross { position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px; border-radius:50%; background:rgba(232,226,210,.7); display:none; }
+  #peek { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.8); opacity:0; transition:opacity .25s, transform .25s cubic-bezier(.34,1.56,.64,1); text-align:center; }
+  #peek.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  #peek img { width:min(42vw,190px); border-radius:10px; box-shadow:0 10px 50px #000; display:block; margin:0 auto 10px; }
+  #peek div { font-size:14px; text-shadow:0 2px 6px #000; }
+  #joy { position:absolute; width:110px; height:110px; border-radius:50%; border:1px solid rgba(232,226,210,.3); display:none; margin:-55px; }
+  #joy i { position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px; border-radius:50%; background:rgba(232,226,210,.28); }
+  #top { position:absolute; left:max(12px, env(safe-area-inset-left)); top:12px; display:flex; gap:6px; }
+  #top button { padding:8px 10px; font-size:12px; }
+  #over { display:none; flex-direction:column; align-items:center; justify-content:safe center; gap:12px; overflow-y:auto; background:rgba(3,3,4,.86); pointer-events:auto; text-align:center; padding:20px; }
+  #over h2 { font-size:clamp(34px,8vw,72px); margin:0; letter-spacing:.12em; }
+  #over p { color:var(--dim); max-width:480px; line-height:1.6; margin:0; }
+  #help { z-index:20; display:none; align-items:center; justify-content:center; background:rgba(3,3,4,.8); pointer-events:auto; padding:20px; }
+  #help > div { max-width:560px; background:#0e0e10; border:1px solid #3a3632; padding:20px 22px; font-size:13.5px; line-height:1.65; color:var(--dim); max-height:86vh; overflow:auto; }
+  #help b { color:var(--ink); }
+  @media (max-width:700px) { #prompt { font-size:14px; } button { padding:12px 13px; font-size:13.5px; } #round { font-size:11px; top:54px; right:10px; padding:6px 8px; } #round .x { display:none; } #subs { top:22%; font-size:14.5px; } }
+  @media (prefers-reduced-motion: reduce) { #toast.show { animation-duration:2.4s; animation-timing-function:linear; } }
+
+  /* --- anlaşılırlık: kimlik çipi, koç, rol kartı, koz bandı, rehber, ne yapabilirim --- */
+  #status .row.who { margin-bottom:3px; }
+  #status .it.kz { padding:2px 9px 2px 2px; gap:7px; background:rgba(232,196,106,.12); outline:1px solid rgba(232,196,106,.45); min-height:36px; }
+  #status .it.kz img { width:32px; height:32px; border-radius:5px; object-fit:cover; filter:grayscale(.2) contrast(1.05); }
+  #status .it.kz b { font-size:12.5px; letter-spacing:.08em; }
+  #status .it.kz em { font-style:normal; font-size:11.5px; color:#e8c46a; }
+  #status .it.kz.used { background:rgba(255,255,255,.04); outline-color:rgba(255,255,255,.12); }
+  #status .it.kz.used em { color:var(--dim); }
+  #status .tip { max-width:min(86vw,340px); }
+  #actions button.gold { background:#e8c46a; color:#16120a; border-color:#e8c46a; font-weight:800; animation:goldP 1.6s ease-in-out infinite; }
+  #actions button.gold kbd { color:#16120a; border-color:rgba(0,0,0,.3); }
+  @keyframes goldP { 0%,100% { box-shadow:0 0 0 0 rgba(232,196,106,.5); } 50% { box-shadow:0 0 0 7px rgba(232,196,106,0); } }
+  @media (prefers-reduced-motion: reduce) { #actions button.gold { animation:none; } }
+  #coach { position:absolute; left:12px; top:calc(150px + env(safe-area-inset-top)); transform:translate(-8px,0); width:min(calc(100vw - 24px),330px); background:rgba(16,14,10,.94); border:1px solid rgba(232,196,106,.5); border-left:4px solid #e8c46a; border-radius:8px; padding:9px 12px; font-size:13.5px; line-height:1.45; color:var(--ink); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:7; }
+  #coach.show { opacity:1; transform:translate(0,0); }
+  #coach i { display:block; font-style:normal; font-size:10px; letter-spacing:.25em; color:#e8c46a; margin-bottom:2px; }
+  #kozb { position:absolute; left:50%; top:calc(58px + env(safe-area-inset-top)); transform:translate(-50%,-10px); display:flex; gap:10px; align-items:center; width:min(92vw,440px); background:rgba(14,12,10,.95); border:1px solid rgba(232,196,106,.55); border-radius:10px; padding:8px 12px 8px 8px; opacity:0; pointer-events:none; transition:opacity .25s, transform .3s; z-index:7; }
+  #kozb.show { opacity:1; transform:translate(-50%,0); }
+  #kozb img { width:46px; height:46px; border-radius:6px; object-fit:cover; flex:none; }
+  #kozb small { display:block; font-size:10px; letter-spacing:.2em; color:var(--dim); }
+  #kozb b { display:block; color:#e8c46a; font-size:15px; letter-spacing:.04em; }
+  #kozb em { display:block; font-style:normal; font-size:12.5px; line-height:1.35; color:var(--ink); }
+  #role { position:fixed; inset:0; z-index:22; display:none; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; background:rgba(3,3,4,.72); padding:14px; pointer-events:auto; overflow:auto; }
+  .rc { width:min(94vw,460px); background:#efe6d2; color:#1a1612; border-radius:12px; padding:14px 16px; box-shadow:0 20px 60px rgba(0,0,0,.7); text-align:left; font-size:13.5px; line-height:1.45; }
+  .rc .top, #pGuide .gh { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+  .rc .top img, #pGuide .gh img { width:76px; height:76px; border-radius:8px; object-fit:cover; flex:none; box-shadow:0 2px 0 rgba(0,0,0,.25); }
+  .rc .top small { display:block; letter-spacing:.3em; font-size:10.5px; color:#8a1c1c; }
+  .rc .top b { display:block; font-size:30px; letter-spacing:.06em; text-transform:uppercase; line-height:1.05; }
+  .rc .kz, .rc .zf, .rc .riv, #pGuide .kz, #pGuide .zf, #pGuide .vs { border-radius:8px; padding:8px 10px; margin-top:8px; }
+  .rc .kz, #pGuide .kz { background:rgba(232,196,106,.35); }
+  .rc .zf, #pGuide .zf { background:rgba(138,28,28,.12); }
+  .rc i, #pGuide i { font-style:normal; font-weight:800; letter-spacing:.06em; font-size:12px; }
+  .rc em { font-style:normal; font-size:11px; opacity:.7; }
+  .rc p { margin:4px 0 0; } .rc .how { font-size:13px; }
+  .rc .riv { background:rgba(0,0,0,.06); }
+  .rc ul, #ctx ul.who { list-style:none; padding:0; margin:6px 0 0; display:flex; flex-direction:column; gap:6px; }
+  .rc li, #ctx ul.who li { display:flex; gap:8px; align-items:center; font-size:12.5px; line-height:1.3; }
+  .rc li img, #ctx ul.who li img { width:34px; height:34px; border-radius:5px; object-fit:cover; flex:none; }
+  .rc li small, #ctx ul.who li small { opacity:.75; }
+  .rc .foot { font-size:11.5px; opacity:.7; margin-top:8px; }
+  #role > .rc { margin-top:auto; } #role > button { min-width:min(94vw,460px); min-height:46px; margin-bottom:auto; flex:none; }
+  @media (max-height:700px) { .rc { font-size:12.5px; padding:10px 12px; } .rc .top img { width:56px; height:56px; } .rc .top b { font-size:24px; } .rc .kz, .rc .zf, .rc .riv { margin-top:6px; padding:6px 9px; } .rc li img { width:28px; height:28px; } }
+  #pGuide .box, #ctx .box { width:min(94vw,520px); }
+  #pGuide .gh b { display:block; font-size:24px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); }
+  #pGuide .gh small { color:var(--dim); letter-spacing:.2em; font-size:10.5px; }
+  #pGuide .gh span { display:block; color:var(--dim); font-size:13px; }
+  #pGuide .kz { background:rgba(232,196,106,.14); border:1px solid rgba(232,196,106,.35); }
+  #pGuide .zf { background:rgba(200,40,40,.1); border:1px solid rgba(200,40,40,.3); }
+  #pGuide .vs { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  #pGuide .kz i { color:#e8c46a; } #pGuide .zf i { color:#ff8a7a; } #pGuide .vs i { color:var(--dim); }
+  #pGuide p { margin:4px 0 0; line-height:1.5; }
+  #pGuide .mini { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:6px; }
+  #pGuide .mini button { display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px; text-transform:none; letter-spacing:0; }
+  #pGuide .mini img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; }
+  #pGuide .row, #ctx .row { display:flex; gap:8px; flex-wrap:wrap; }
+  #pGuide .row button, #ctx .row button { flex:1 1 160px; }
+  #ctx p { margin:2px 0; line-height:1.5; color:var(--dim); } #ctx p b { color:var(--ink); }
+  #ctx .now { border-left:3px solid #e8c46a; padding-left:8px; } #ctx .warn { border-left:3px solid var(--red); padding-left:8px; }
+  #ctx ul { margin:4px 0 0; padding-left:18px; color:var(--dim); line-height:1.5; } #ctx ul b { color:var(--ink); }
+  #helpQ { border:1px solid rgba(232,196,106,.35); background:rgba(232,196,106,.07); padding:10px 12px; margin-bottom:12px; border-radius:6px; color:var(--ink); }
+  #lobby { position:absolute; left:50%; top:calc(12px + env(safe-area-inset-top)); transform:translateX(-50%); display:none; align-items:center; gap:12px; padding:6px 14px; background:rgba(12,10,8,.86); border:1px solid rgba(232,196,106,.45); border-radius:10px; z-index:6; pointer-events:none; max-width:min(70vw,420px); }
+  #lobby div { display:flex; flex-direction:column; gap:1px; text-align:left; }
+  #lobby small { font-size:10.5px; letter-spacing:.28em; color:#e8c46a; }
+  #lobby b { font-size:30px; line-height:1; font-variant-numeric:tabular-nums; color:var(--ink); min-width:1.4em; text-align:center; }
+  #lobby span { font-size:11px; color:var(--dim); line-height:1.3; }
+  #lobby.hot b { color:#ff6a5a; animation:lobP .5s ease-in-out infinite alternate; }
+  body.lob #subs { top:calc(16% + 34px); }
+  @media (max-width:700px) { #lobby span { display:none; } #lobby { top:calc(56px + env(safe-area-inset-top)); } body.lob #subs { top:calc(22% + 30px); } }
+  @keyframes lobP { from { transform:scale(1); } to { transform:scale(1.12); } }
+  @media (prefers-reduced-motion: reduce) { #lobby.hot b { animation:none; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="lbT" class="lb"></div><div id="lbB" class="lb"></div>
+<div id="hud" class="layer">
+  <div id="tags"></div>
+  <div id="cross"></div>
+  <button id="bSkip" style="display:none;position:absolute;right:12px;top:12px;z-index:5" data-en="Skip tutorial">Öğreticiyi geç</button>
+  <div id="top"><button id="bPause" aria-label="Menü">☰</button><button id="bHelp" aria-label="Ne yapabilirim?" title="Ne yapabilirim?">?</button><button id="bEmo" data-en="Gesture">Jest</button></div>
+  <div id="timer"><i></i></div>
+  <div id="emo"></div>
+  <div id="market"></div>
+  <div id="round"></div>
+  <div id="subs"></div>
+  <div id="toast"></div>
+  <div id="peek"><img alt=""><div></div></div>
+  <div id="status"></div>
+  <div id="bet"></div>
+  <div id="ghost"></div>
+  <div id="votes"></div>
+  <button id="talk" style="display:none" aria-label="Telsizle konuş">🎙 <span data-en="Radio">Telsiz</span></button>
+  <div id="trig" role="button" aria-label="Tetiği çek: basılı tut"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="48" class="b"/><circle cx="55" cy="55" r="48" class="p"/></svg><b>TETİK</b><small>basılı tut</small></div>
+  <div id="lobby" role="timer" aria-live="off"><div><small data-en="TABLE OPENS IN">MASA KURULUYOR</small><span data-en="Walk, sit, punch · Left click / F: punch · Space: table">Gez, otur, yumruk at · Sol tık / F: yumruk · Boşluk: masa</span></div><b id="lobT">30</b></div>
+  <div id="coach" role="status" aria-live="polite"></div>
+  <div id="kozb" role="status" aria-live="polite"></div>
+  <div id="bottom"><div id="prompt"></div><div id="actions"></div></div>
+  <div id="joy"><i></i></div>
+</div>
+
+<div id="help" class="layer"><div>
+  <div id="helpQ" data-en="<b>MUHBİR IN ONE MINUTE</b><br>1. Everyone holds cards in pairs; only one card, the <b>INFORMANT</b>, has no match.<br>2. On your turn you draw one card from the previous player. Pairs go to the table.<br>3. When the round ends, whoever holds the Informant faces the revolver (roulette).<br>4. If you are sure who holds it, <b>Accuse</b> with a bullet. Right: they lose a life. Wrong: you do.<br>5. Last one alive takes the money.<br><br>In Fast and Dark modes you are also a <b>character</b>: one trump (once per game, gold button) and one flaw. The card at the start of each game tells you who you are; your picture stays top-left.<br><b>Simple game</b> (main menu) hides the extras until you are ready."><b>1 DAKİKADA MUHBİR</b><br>1. Herkesin elinde çift çift kartlar var; yalnızca bir kartın, <b>MUHBİR</b>’in, eşi yok.<br>2. Sıran gelince önceki oyuncudan bir kart çekersin. Çiftler masaya gider.<br>3. Tur bitince Muhbir kimde kaldıysa tabancayı kendine çevirir (rulet).<br>4. Muhbir’in kimde olduğundan eminsen mermiyle <b>Suçla</b>. Haklıysan o can kaybeder, yanılırsan sen.<br>5. Masada son kalan parayı alır.<br><br>Hızlı ve Karanlık modda ayrıca bir <b>karaktersin</b>: bir koz (oyunda 1 kez, altın düğme) ve bir zaaf. Her oyunun başındaki kart kim olduğunu söyler; resmin sol üstte durur.<br><b>Sade oyun</b> (ana menü) ekstraları sen hazır olana kadar gizler.</div>
+  <div id="helpT" data-en="<b>MUHBİR (THE INFORMANT) — RULES</b><br><br><b>Goal:</b> Do not be the one holding the single unmatched INFORMANT card when the round ends. Run out of lives and you die; the last one at the table takes the money.<br><br><b>Turn:</b> On your turn pick a card from the previous player. If it matches one of yours the pair is discarded and gives a reward.<br><br><b>Pair rewards:</b> Bullet → +1 bullet · Radio → see a random card of a rival · Mask → cancels the first correct accusation against you · Key → open the car trunk · Plate → reverse the direction on your turn · Fake ID → one bullet less in roulette · Cash and Safe → money.<br><br><b>Market:</b> After every round everyone gets ₺3,000 and the market opens: buy bullets, a radio, a plate, a fake ID, a mask or a life.<br><br><b>Events:</b> In some rounds sirens put the lights out, a patrol at the door forbids accusations for the round, or the TV gives a false tip.<br><br><b>Accusing:</b> With a bullet you may accuse someone before drawing. If they hold the Informant they lose a life; if not, you do.<br><br><b>Roulette:</b> Whoever is left with the Informant turns the gun on themselves. One more chamber is loaded each round.<br><br><b>Bluff:</b> Tap one of your own cards to push it forward.<br><br><b>Timer:</b> If your time runs out a random card is drawn. Stay away from the table too long and you are called back.<br><br><b>Garage:</b> When it is not your turn you can stand up: start the car, turn on the headlights, open the trunk, cut the power, watch TV.<br><br><b>Keyboard:</b> Mouse: look and pick · Space: stand/sit · W A S D: walk · E: interact · Q: accuse · T: radio · R: reverse · G: gesture · Esc: menu.<br><b>Phone:</b> Tap: pick · Drag: look · Standing: left half walks, right half looks.<br><b>Gamepad:</b> Left stick walks, right stick looks, D-pad picks cards and buttons, A confirms, B stands/sits, Start opens the menu.<br><br><b>The Ear:</b> from round two, in some rounds one player secretly learns who holds the Informant at that moment. The tip goes stale as the card moves.<br><b>Spectator bet:</b> when dead, bet each round on who will face the roulette; a correct call pays 30 XP.<br><br><b>Characters (Fast and Dark modes):</b> Each character has one <b>trump</b> usable once per game and one permanent <b>flaw</b>. Pick yours under Character in the main menu; your trump sits top-left with a ★, tap it for details.<br>· <b>Rookie</b> — Trump: if you draw the Informant, put it back and draw again. Flaw: you flinch when you draw it and the whole table sees.<br>· <b>Butcher</b> — Trump: whoever draws from you must take the card you push forward. Flaw: your cards are never reshuffled, so the Informant can be tracked.<br>· <b>Doctor</b> — Trump: learn in secret whether a rival holds the Informant. Flaw: when anyone loses a life you skip your next turn.<br>· <b>Silent</b> — Trump: kill the lights and swap one of your cards with a random card of a rival. Flaw: your accusation is delayed a turn; you point first. Starts with a mask.<br>· <b>Pickpocket</b> — Trump: steal a rival’s item. Flaw: half the time you are caught and play a turn with your hand open.<br>· <b>Driver</b> — Trump: flash the headlights and see three of a rival’s cards. Flaw: your turn timer is always short.<br><b>Tells:</b> each character has a signature move it usually makes while holding the Informant (one drums fingers, one leans back…). Learn them by watching; now and then they do it for nothing.<br>Classic mode has no trumps or flaws. The table seats 4 or 5.<br><br><b>Credits:</b> Car: “Car Concept” by Eric Chadwick / Darmstadt Graphics Group (CC BY 4.0, modified). Characters: Microsoft Rocketbox (MIT, © Microsoft). Props: Poly Haven and Khronos sample models (CC0)."><b>MUHBİR — KURALLAR</b><br><br>
+  <b>Amaç:</b> Tur bittiğinde tek ve eşsiz MUHBİR kartı elinde kalan sen olma. Canların biterse ölürsün; masada son kalan parayı alır.<br><br>
+  <b>Sıra:</b> Sıran gelince önceki oyuncunun elinden bir kart seç. Elindeki bir kartla eşleşirse çift masaya atılır ve ödül verir.<br><br>
+  <b>Çift ödülleri:</b> Mermi → +1 mermi · Telsiz → bir rakibin rastgele bir kartını gör · Maske → sana yapılan ilk doğru suçlamayı boşa çıkarır · Anahtar → arabanın bagajını aç · Plaka → sıranda oyunun yönünü çevir · Sahte Kimlik → rulette bir mermi eksilir · Nakit ve Kasa → para.<br><br>
+  <b>Pazar:</b> Her turun sonunda herkese 3.000 ₺ verilir ve pazar açılır: paranla mermi, telsiz, plaka, sahte kimlik, maske ya da can alırsın.<br><br>
+  <b>Olaylar:</b> Bazı turlarda siren yüzünden ışıklar söner, kapıya devriye gelir ve o tur suçlama yapılamaz, ya da televizyon yanlış ihbar verir.<br><br>
+  <b>Suçlama:</b> Mermin varsa kart çekmeden önce birini suçlayabilirsin. Muhbir ondaysa o bir can kaybeder; değilse sen kaybedersin.<br><br>
+  <b>Rulet:</b> Tur sonunda Muhbir elinde kalan, tabancayı kendine çevirir. Her turda bir yuva daha dolar.<br><br>
+  <b>Blöf:</b> Kendi kartına dokunursan onu öne çıkarırsın.<br><br>
+  <b>Süre:</b> Hamlen için süren dolarsa rastgele bir kart çekilir. Masadan uzun süre uzak kalırsan geri çağrılırsın.<br><br>
+  <b>Mekân:</b> Sıra sende değilken kalkabilirsin. Arabayı çalıştır, farları yak, bagajı aç, şalteri indir, televizyona bak; radyoyu aç, feneri söndür, kepenge vur, yangın tüpünü sık, kanepeye otur. Masadakiler yaptığını görür ve laf atar. Garajın yanında üç mekân daha var: otopark, liman antreposu, tren deposu.<br><br>
+  <b>Anlaşma:</b> Bir rakibin adına dokun ve iki turluk anlaşma teklif et (oyunda bir kez, botlara). Kabul ederse birbirinizi suçlamazsınız ve sana temiz kartını uzatır. Sözünü tutmayabilir; sen bozarsan da unutmaz.<br><br>
+  <b>Sorgu:</b> Sıranda bir bota "Kart sende mi?" diye sorabilirsin (turda bir kez). Yalan söyleyebilir; yalan söyleyenin eli bazen titrer. Botlar da seni sorgular: uzun düşünürsen şüphelenirler.<br><br>
+  <b>Fener ve takas:</b> Nakit çifti el feneri, kasa çifti takas kartı verir; bagajdan da çıkar. Fener bir eli bir tur herkese açar, takas bir rakiple rastgele birer kart değiştirir.<br><br>
+  <b>Mekân kuralları:</b> Otoparkta her tur bir arabanın farı bir eli aydınlatır, limanda gemi düdüğünde herkes bir kartını soluna verir, tren deposunda makas her tur değişir.<br><br>
+  <b>İki muhbir:</b> Beş kişilik masada iki eşsiz kart var; tur bitince ikisini tutan da rulete girer. İkisi tek eldeyse tabancaya bir mermi fazla girer.<br><br>
+  <b>Bahis ve hayalet:</b> Her tur başında rulete kimin gireceğine altın yatırabilirsin. Ölürsen gitmezsin: her tur bir kez ışığı kırpar, bir eli titretir ya da habere ihbar düşersin.<br><br>
+  <b>Masadan kalkmak:</b> Uzaktayken botlar kartlarına bakabilir; ama etrafta bazen bir ipucu parlar.<br><br>
+  <b>Köstebek modu:</b> Muhbir sensin. Kart her tur senin elinde başlar; beş tur hayatta kalırsan polis baskını gelir ve kazanırsın.<br><br>
+  <b>Bilgisayar:</b> Fare: bak ve seç · Boşluk: kalk/otur · W A S D: yürü · E: etkileşim · Q: suçla · T: telsiz · R: yön · G: jest · Esc: menü.<br>
+  <b>Telefon:</b> Dokun: seç · Sürükle: bak · Ayaktayken sol yarı yürür, sağ yarı baktırır.<br>
+  <b>Oyun kolu:</b> Sol çubuk yürür, sağ çubuk baktırır, yön tuşları kart ve düğme seçer, A onaylar, B kalkar/oturur, Start menüyü açar.<br><br><b>Kulak:</b> İkinci turdan sonra bazı turlarda bir oyuncu, Muhbir’in o an kimde olduğunu gizlice öğrenir. Kart el değiştirdikçe bu bilgi eskir.<br><b>Seyirci bahsi:</b> Ölürsen her tur kimin rulete gireceğine bahse girersin; tutarsa 30 puan kazanırsın.<br><br><b>Karakterler (Hızlı ve Karanlık modda):</b> Her karakterin oyun başına bir kez kullandığı bir <b>kozu</b> ve sürekli taşıdığı bir <b>zaafı</b> var. Karakterini ana menüde Karakter’den seçersin; kozun sol üstte ★ ile durur, dokununca açıklaması çıkar.<br>· <b>Çaylak</b> — Koz: Muhbir’i çekersen geri koyup bir daha çekersin. Zaaf: Muhbir’i çekince irkilirsin, bütün masa görür.<br>· <b>Kasap</b> — Koz: senden kart çekecek kişi, öne çıkardığın kartı almak zorunda kalır. Zaaf: kartlarının sırası değişmez, Muhbir’in yeri takip edilebilir.<br>· <b>Doktor</b> — Koz: bir oyuncuda Muhbir var mı, yalnızca sen öğrenirsin. Zaaf: biri can kaybedince sonraki sıranı pas geçersin.<br>· <b>Sessiz</b> — Koz: ışıkları söndürüp bir kartını bir rakibin rastgele kartıyla değiştirirsin. Zaaf: suçlaman bir tur gecikir; önce işaret edersin. Masaya maskeli oturur.<br>· <b>Yankesici</b> — Koz: bir rakibin eşyasını çalarsın. Zaaf: yarı yarıya yakalanır, bir tur elini açık oynarsın.<br>· <b>Şoför</b> — Koz: farları yakıp bir rakibin üç kartını görürsün. Zaaf: hamle süren hep kısadır.<br><b>Tikler:</b> her karakterin Muhbir elindeyken çoğu zaman yaptığı kendine özgü bir hareket vardır (biri parmaklarını tıkırdatır, biri arkasına yaslanır…). Hangisinin ne yaptığını izleyerek öğrenirsin; ara sıra boşuna da yaparlar.<br>Klasik modda koz ve zaaf yoktur. Masa 4 ya da 5 kişilik kurulabilir.<br><br><b>Emeği geçenler:</b> Araba: “Car Concept”, Eric Chadwick / Darmstadt Graphics Group (CC BY 4.0, değiştirildi). Karakterler: Microsoft Rocketbox (MIT, © Microsoft). Eşyalar: Poly Haven ve Khronos örnek modelleri (CC0).</div><br>
+  <button id="bHelpX" data-en="Close">Kapat</button>
+</div></div>
+
+<div id="role" role="dialog" aria-modal="true" aria-label="Bu oyunda sen"></div>
+<div id="ff" class="layer" data-en="Skipping tutorial…">Öğretici geçiliyor…</div>
+<div id="night"></div>
+<div id="over" class="layer"><h2 id="overT"></h2><p id="overP"></p><div id="overX"></div><div class="row" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button id="campNext" class="red" style="display:none" data-en="Next night">Sonraki gece</button><button id="again" class="red" data-en="Play again">Yeniden oyna</button><button id="toMenu" data-en="Main menu">Ana menü</button></div></div>
+
+<div id="prep" role="status" aria-live="polite"><div class="lamp"><div class="deck"><i></i><i></i><i></i></div></div><b id="prepTxt">Masa hazırlanıyor…</b><div class="bar"><i id="prepBar"></i></div><small id="prepTip"></small></div>
+<div id="menu" class="layer">
+  <div class="desk">
+    <div class="page">
+      <div class="clip" aria-hidden="true"></div><div class="stamp" aria-hidden="true" data-en="SECRET">GİZLİ</div>
+      <h1>MUHB<span>İ</span>R</h1>
+      <div class="kicker" data-en="POLICE HQ · FILE NO 1986/16 · CENTRAL BRANCH ROBBERY · SUSPECTS">EMNİYET MÜDÜRLÜĞÜ · DOSYA NO 1986/16 · MERKEZ ŞUBESİ SOYGUNU · ŞÜPHELİLER</div>
+      <div id="mugs" class="mugs"></div>
+      <div id="mugInfo" class="minfo" aria-live="polite"></div>
+      <div class="tag" data-en="INTERNAL NOTE: one of the crew works for us. Nobody at the table knows who. Whoever is left holding that card pays for it.">İÇ NOT: Ekipten biri bize çalışıyor. Kim olduğunu masadakiler bilmiyor. O kart kimin elinde kalırsa bedelini o öder.</div>
+      <div id="daily" class="daily"></div>
+      <div class="opts">
+        <label><span data-en="Game">Oyun</span><select id="gsimple"><option value="1" data-en="Simple (recommended)">Sade (önerilen)</option><option value="0" data-en="Full: bets, missions, questioning, venue rules">Tam: bahis, görev, sorgu, mekân kuralı</option></select></label>
+        <label><span data-en="Mode">Mod</span><select id="gmode"><option value="fast" data-en="Fast">Hızlı</option><option value="classic" data-en="Classic">Klasik</option><option value="dark" data-en="Dark">Karanlık</option><option value="mole" data-en="Mole (you are the informant)">Köstebek (muhbir sensin)</option><option value="iki" data-en="Two informants (5 players)">İki muhbir (5 kişi)</option></select></label>
+        <label><span data-en="Rivals">Rakipler</span><select id="diff"><option value="easy" data-en="Easy">Kolay</option><option value="normal" selected>Normal</option><option value="hard" data-en="Hard">Zor</option></select></label>
+        <label><span data-en="Table">Masa</span><select id="gseats"><option value="5" data-en="5 players">5 kişi</option><option value="4" data-en="4 players">4 kişi</option></select></label>
+        <label><span data-en="Location">Mekân</span><select id="gvenue"><option value="garaj" data-en="Garage">Garaj</option><option value="otopark" data-en="Car park">Otopark</option><option value="liman" data-en="Harbour">Liman</option><option value="tren" data-en="Train depot">Tren deposu</option><option value="rast" data-en="Random">Rastgele</option></select></label>
+        <label><span data-en="Turn timer">Sıra süresi</span><select id="gtimer"><option value="0" data-en="Off">Kapalı</option><option value="20">20 sn</option><option value="30">30 sn</option><option value="45">45 sn</option></select></label>
+      </div>
+    </div>
+    <div class="tabs">
+      <button id="play" data-en="Sit at the table">Masaya otur</button>
+      <button id="bCamp"><span data-en="Story · 5 nights">Hikâye · 5 gece</span><small data-en="statements">ifade tutanakları</small></button>
+      <button id="bWeek"><span data-en="Table of the week">Haftanın masası</span><small></small></button>
+      <button id="bDay"><span data-en="Daily heist">Günün soygunu</span><small></small></button>
+      <button id="bOnline"><span data-en="Online">Çevrimiçi</span><small data-en="radio logs">telsiz kayıtları</small></button>
+      <button id="bTut"><span data-en="Tutorial">Öğretici</span><small data-en="scene sketch">olay yeri krokisi</small></button>
+      <button id="bGuide"><span data-en="Character guide">Karakter öğreticisi</span><small data-en="who does what">kim ne yapar</small></button>
+      <button id="bChar"><span data-en="Characters">Karakterler</span><small data-en="masks, gloves, gun">maske, eldiven, tabanca</small></button>
+      <nav class="links">
+        <button id="bStory" data-en="Story">Hikâye</button><button id="bHow" data-en="Rules">Kurallar</button><button id="bProf" data-en="Profile">Profil</button><button id="bCrew" data-en="Crew">Ekip</button><button id="bDeco" data-en="Garage">Garaj</button><button id="bSet" data-en="Settings">Ayarlar</button>
+      </nav>
+    </div>
+  </div>
+  <div id="stats" style="color:var(--dim);font-size:13px"></div>
+  <div id="loading"></div>
+</div>
+
+<div id="pOnline" class="panel layer"><div class="box">
+  <b data-en="ONLINE ROOM">ÇEVRİMİÇİ ODA</b>
+  <p class="dim" data-en="Works with people you invited to this page who are signed in to Claude. Visitors who only have the open link can play offline only. Up to 4 players; empty seats are filled by bots.">Bu sayfaya davet ettiğin ve Claude hesabıyla giriş yapmış kişilerle çalışır. Yalnızca açık bağlantıyla gelenler çevrimdışı oynayabilir. En çok 4 kişi; boş koltuklara bot oturur.</p>
+  <div id="onA"><div class="row"><button id="oHost" class="red" data-en="Create room">Oda kur</button><span class="dim" data-en="or">ya da</span><input type="text" id="oCode" maxlength="4" placeholder="KOD" autocomplete="off" aria-label="Oda kodu"><button id="oJoin" data-en="Join">Katıl</button><button id="oWatch" data-en="Watch">İzle</button></div></div>
+  <div id="onB" style="display:none"><div id="oTitle"></div><ol id="oList"></ol><div class="row"><button id="oStart" class="red" data-en="Start">Başlat</button><button id="oLeave" data-en="Leave">Ayrıl</button></div></div>
+  <div id="oMsg" class="dim"></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+
+<div id="pChar" class="panel layer"><div class="box">
+  <b data-en="CHARACTERS">KARAKTERLER</b>
+  <span class="dim" data-en="Pick your character. Trumps and flaws apply in Fast and Dark modes.">Karakterini seç. Koz ve zaaf Hızlı ve Karanlık modda geçerli.</span><div class="sw" id="cJacket"></div>
+  <label><span data-en="Name">İsim</span><input type="text" id="cName" maxlength="12" autocomplete="off"></label>
+  <span class="dim" data-en="Mask (others see it online)">Maske (çevrimiçinde diğerleri görür)</span><div class="sw" id="cMask"></div>
+  
+  
+  <span class="dim" data-en="Card back">Kart sırtı</span><div class="sw" id="cBack"></div>
+  <span class="dim"><span data-en="Gloves and gun (bought with gold) ·">Eldiven ve tabanca (altınla alınır) ·</span> <b id="cCoins" style="color:#e8c46a"></b></span><div class="sw" id="cGlove"></div><div class="sw" id="cGun"></div>
+  <span class="dim" id="cNote"></span>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+
+<div id="pCamp" class="panel layer"><div class="box" style="max-width:520px;text-align:left">
+  <b data-en="STORY MODE · 5 NIGHTS">HİKÂYE MODU · 5 GECE</b>
+  <div id="campBody"></div>
+  <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"><button id="campGo" class="red"></button><button id="campReset" data-en="Reset story">Hikâyeyi sıfırla</button><button class="x" data-en="Close">Kapat</button></div>
+</div></div>
+<div id="pStory" class="panel layer"><div class="box">
+  <span class="date" data-en="SUNDAY, 16 NOVEMBER 1986">16 KASIM 1986, PAZAR</span>
+  <b data-en="THE INFORMANT">MUHBİR</b>
+  <p data-en="The bank job went fine. Four of you made it back to the garage with the money. Then the TV said the police knew every step in advance. <b>One of you is working for them.</b>">Banka işi temiz bitti. Dördünüz parayla garaja döndünüz. Sonra televizyon, polisin her adımı önceden bildiğini söyledi. <b>Aranızdan biri onlara çalışıyor.</b></p>
+  <p data-en="Nobody leaves until it is settled, and it is settled with cards. Throw away the cards you hold in pairs and draw from the player next to you. One card has no pair: <b>the Informant</b>. Whoever is left holding it when the round ends puts the revolver to their own head.">İş çözülmeden kimse çıkmıyor; çözüm de kartlarla. Elindeki çiftleri at, yanındakinden kart çek. Tek bir kartın eşi yok: <b>Muhbir</b>. Tur bittiğinde o kart kimdeyse tabancayı kendi başına dayar.</p>
+  <p data-en="<b>What to do with your money:</b> every pair you throw pays out (bullets, a radio, cash…) and everyone alive gets 3,000 ₺ per round. Between rounds a market opens: buy bullets, a mask, a fake ID or an extra life. Money does not win the game; it keeps you alive."><b>Paranı ne yapacaksın:</b> Attığın her çift bir şey kazandırır (mermi, telsiz, nakit…), her tur da hayatta kalan herkese 3.000 ₺ gelir. Turlar arasında pazar açılır: mermi, maske, sahte kimlik ya da fazladan can alırsın. Para oyunu kazandırmaz; seni hayatta tutar.</p>
+  <p data-en="<b>How to win:</b> be the last one alive. The top-left panel shows what you carry; tap an item to see what it does."><b>Nasıl kazanırsın:</b> Ayakta kalan son kişi ol. Sol üstteki panel üstünde ne taşıdığını gösterir; bir eşyaya dokunursan ne işe yaradığını söyler.</p>
+  <button class="x red" id="storyGo" data-en="Sit at the table">Masaya otur</button>
+</div></div>
+<div id="pWatch" class="panel layer"><div class="box">
+  <b data-en="WATCHING">İZLİYORSUN</b>
+  <span class="dim" data-en="You are not at the table. Every round, guess who ends up at the roulette; the players see the audience's votes.">Masada değilsin. Her tur rulete kimin gireceğini tahmin et; oyuncular izleyicilerin oylarını görür.</span>
+  <div id="watchBody"></div>
+  <button id="wLeave" data-en="Leave">Ayrıl</button>
+</div></div>
+<div id="pCrew" class="panel layer"><div class="box">
+  <b data-en="CREW">EKİP</b>
+  <span class="dim" data-en="Bring one person to the table. Applies in single-player games (not the daily heist or the table of the week). Story nights you win unlock one for free.">Masaya yanında birini getir. Tek kişilik oyunlarda geçerli (günün soygunu ve haftanın masası hariç). Hikâyede kazandığın her gece birini bedavaya açar.</span>
+  <div id="crewList" class="shop"></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+<div id="pDeco" class="panel layer"><div class="box">
+  <b data-en="GARAGE">GARAJ</b>
+  <span class="dim" data-en="Decorate the garage with gold. In online games everyone sees their own garage.">Garajı altınla döşe. Çevrimiçinde herkes kendi garajını görür.</span>
+  <div id="decoList" class="shop"></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+<div id="legend" aria-live="polite"><small>EFSANE EL</small><b></b><span></span></div>
+<div id="pProf" class="panel layer"><div class="box">
+  <b data-en="PROFILE">PROFİL</b>
+  <div id="profBody"></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+
+<div id="pause" class="panel layer"><div class="box">
+  <b id="pTitle"></b>
+  <label><span data-en="Sound">Ses</span><input type="range" id="sVol" min="0" max="1" step="0.05" aria-label="Ses"></label>
+  <label><span data-en="Music">Müzik</span><input type="range" id="sMus" min="0" max="1" step="0.05" aria-label="Müzik"></label>
+  <label><span data-en="Look sensitivity">Bakış hassasiyeti</span><input type="range" id="sSens" min="0.3" max="2.5" step="0.1" aria-label="Bakış hassasiyeti"></label>
+  <label><span data-en="Voices">Seslendirme</span><select id="sVoice"><option value="1" data-en="On">Açık</option><option value="0" data-en="Off">Kapalı</option></select></label>
+  <label><span data-en="Shake and flashes">Sarsıntı ve parlama</span><select id="sFx"><option value="1" data-en="Full">Tam</option><option value="0" data-en="Reduced">Az</option></select></label>
+  <label><span data-en="Streamer mode (hide room code)">Yayıncı modu (oda kodunu gizle)</span><select id="sStream"><option value="0" data-en="Off">Kapalı</option><option value="1" data-en="On">Açık</option></select></label>
+  <label><span data-en="Free roam before the game">Oyun öncesi serbest dolaşma</span><select id="sLobby"><option value="1" data-en="30 seconds">30 saniye</option><option value="0" data-en="Off">Kapalı</option></select></label>
+  <label><span data-en="Tips during play">Oyun içi ipuçları</span><select id="sCoach"><option value="1" data-en="On">Açık</option><option value="0" data-en="Off">Kapalı</option></select></label>
+  <label><span data-en="Graphics quality">Görüntü kalitesi</span><select id="qual"><option value="high" data-en="High">Yüksek</option><option value="mid" data-en="Medium">Orta</option><option value="low" data-en="Low (old phone)">Düşük (eski telefon)</option></select></label>
+  <label><span data-en="Language">Dil</span><select id="sLang"><option value="tr">Türkçe</option><option value="en">English</option></select></label>
+  <div class="row" id="pBtns"><button id="pResume" class="red" data-en="Resume">Devam et</button><button id="pRestart" data-en="Restart">Yeniden başlat</button><button id="pMenu" data-en="Main menu">Ana menü</button></div>
+  <button id="pGuideB" data-en="Character guide">Karakter rehberi</button>
+  <button class="x" id="pClose" data-en="Close">Kapat</button>
+</div></div>
+
+<div id="pGuide" class="panel layer"><div class="box">
+  <b data-en="CHARACTER GUIDE">KARAKTER ÖĞRETİCİSİ</b>
+  <div id="gBody"></div>
+  <div class="row"><button id="gPrev" data-en="Previous">Önceki</button><button id="gNext" class="red" data-en="Next">Sonraki</button></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+<div id="ctx" class="panel layer"><div class="box">
+  <b data-en="WHAT CAN I DO?">NE YAPABİLİRİM?</b>
+  <div id="ctxB"></div>
+  <div class="row"><button id="ctxGuide" data-en="Character guide">Karakter rehberi</button><button id="ctxRules" data-en="All rules">Tüm kurallar</button></div>
+  <button class="x red" data-en="Back to the game">Oyuna dön</button>
+</div></div>
+<script src="./game.js?v=b00e3b62"></script>
+</body>
+</html>
