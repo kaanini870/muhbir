@@ -267,6 +267,7 @@
   @media (max-width:700px) { #lobby span { display:none; } #lobby { top:calc(56px + env(safe-area-inset-top)); } body.lob #subs { top:calc(22% + 30px); } }
   @keyframes lobP { from { transform:scale(1); } to { transform:scale(1.12); } }
   @media (prefers-reduced-motion: reduce) { #lobby.hot b { animation:none; } }
+  .oname { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px; } .oname input { font-size:16px; padding:10px; } .oname.need input { outline:2px solid var(--red); }
 </style>
 </head>
 <body>
@@ -370,7 +371,8 @@
 
 <div id="pOnline" class="panel layer"><div class="box">
   <b data-en="ONLINE ROOM">ÇEVRİMİÇİ ODA</b>
-  <p class="dim" data-en="Works with people you invited to this page who are signed in to Claude. Visitors who only have the open link can play offline only. Up to 4 players; empty seats are filled by bots.">Bu sayfaya davet ettiğin ve Claude hesabıyla giriş yapmış kişilerle çalışır. Yalnızca açık bağlantıyla gelenler çevrimdışı oynayabilir. En çok 4 kişi; boş koltuklara bot oturur.</p>
+  <label class="oname"><span data-en="Your name (everyone sees it)">Adın (herkes görür)</span><input type="text" id="oName" maxlength="12" autocomplete="nickname" placeholder="Adını yaz" data-en-ph="Type your name"></label>
+  <p class="dim" data-en="Create a room and send the 4-letter code to your friends; they open the same link and join with the code. Up to 5 players; empty seats are filled by bots.">Oda kur, 4 harfli kodu arkadaşlarına gönder; aynı linki açıp kodla katılsınlar. En fazla 5 kişi; boş koltuklara bot oturur.</p>
   <div id="onA"><div class="row"><button id="oHost" class="red" data-en="Create room">Oda kur</button><span class="dim" data-en="or">ya da</span><input type="text" id="oCode" maxlength="4" placeholder="KOD" autocomplete="off" aria-label="Oda kodu"><button id="oJoin" data-en="Join">Katıl</button><button id="oWatch" data-en="Watch">İzle</button></div></div>
   <div id="onB" style="display:none"><div id="oTitle"></div><ol id="oList"></ol><div class="row"><button id="oStart" class="red" data-en="Start">Başlat</button><button id="oLeave" data-en="Leave">Ayrıl</button></div></div>
   <div id="oMsg" class="dim"></div>
@@ -458,6 +460,6 @@
   <div class="row"><button id="ctxGuide" data-en="Character guide">Karakter rehberi</button><button id="ctxRules" data-en="All rules">Tüm kurallar</button></div>
   <button class="x red" data-en="Back to the game">Oyuna dön</button>
 </div></div>
-<script src="./game.js?v=b00e3b62"></script>
+<script src="./game.js?v=717b6c30"></script>
 </body>
 </html>
