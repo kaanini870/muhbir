@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
+<head><script>window.ASSET_V='6d0584b1';window.ASSET_M=["BoomBox","WaterBottle","bar_chair_round_01","barrel_03","c_doktor","c_kasap","c_m07","c_sen","c_sessiz","c_sofor","c_yankesici","car","cardboard_box_01","korean_fire_extinguisher_01","lantern_01","metal_jerrycan","metal_tool_chest","old_tyre","p_doktor","p_kasap","p_sessiz","p_sofor","p_yankesici","plastic_monobloc_chair_01","power_box_01","revolver","rollershutter_door","sofa_03","television_01","wooden_crate_01","wooden_table_01"]</script>
 <meta charset="utf-8">
 <title>MUHBİR</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -163,6 +163,21 @@
   .panel input[type=range] { width:55%; accent-color:var(--red); pointer-events:auto; }
   .panel select, .panel input[type=text] { font-family:var(--mono); background:#111; color:var(--ink); border:1px solid #4a463c; padding:9px; font-size:14px; pointer-events:auto; min-width:0; }
   .panel .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  #menu .daily.wk { margin-top:2px; font-weight:400; color:#5b4a30; }
+  .lbox { max-width:560px; }
+  .lbox .code { font-family:ui-monospace,monospace; letter-spacing:.12em; font-size:1.1em; }
+  .wkbox { border:1px solid rgba(232,226,210,.18); padding:10px 12px; display:flex; flex-direction:column; gap:4px; background:rgba(0,0,0,.22); }
+  .wkbox b { font-size:12px; letter-spacing:.14em; color:#c9a96a; }
+  .wkbox .bar { height:6px; background:rgba(255,255,255,.1); } .wkbox .bar i { display:block; height:100%; background:#b3131a; }
+  .wkbox small { color:var(--dim); }
+  .seg button.on { background:#e8e2d2; color:#141210; }
+  .lbwrap { max-height:38vh; overflow:auto; flex-shrink:0; }
+  #lbTab { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+  #lbTab th, #lbTab td { text-align:left; padding:6px 8px; border-bottom:1px solid rgba(232,226,210,.1); }
+  #lbTab th { font-size:11px; letter-spacing:.1em; color:var(--dim); font-weight:600; }
+  #lbTab tr.me td { color:#e8e2d2; font-weight:700; background:rgba(179,19,26,.18); }
+  #lbIn { text-transform:uppercase; width:9em; }
+  @media (max-height:520px) { .lbox { gap:7px; } .lbox .row button { padding:6px 10px; } .wkbox { padding:6px 10px; gap:2px; } .lbwrap { max-height:none; } #lbTab th, #lbTab td { padding:4px 8px; } #lbMsg { margin:0; } }
   .dim { color:var(--dim); font-size:13px; line-height:1.5; margin:0; }
   .sw { display:flex; gap:10px; flex-wrap:wrap; } .sw button.txt { width:auto; height:auto; padding:9px 12px; border-radius:8px; font-size:12.5px; } .sw button { width:44px; height:44px; padding:0; border-radius:50%; } .sw button.on { outline:2px solid var(--ink); outline-offset:3px; } .sw button.lock { opacity:.25; }
   #oList { margin:0; padding-left:22px; line-height:1.8; } #oTitle { font-size:24px; letter-spacing:.3em; font-weight:700; }
@@ -268,6 +283,81 @@
   @keyframes lobP { from { transform:scale(1); } to { transform:scale(1.12); } }
   @media (prefers-reduced-motion: reduce) { #lobby.hot b { animation:none; } }
   .oname { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px; } .oname input { font-size:16px; padding:10px; } .oname.need input { outline:2px solid var(--red); }
+  i.cn { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#5fd36a; box-shadow:0 0 6px rgba(95,211,106,.6); }
+  i.cn.weak { background:#f0c24a; box-shadow:0 0 6px rgba(240,194,74,.6); } i.cn.gone { background:#ff5a4a; animation:cnB 1s steps(2) infinite; } i.cn.bot { background:#8a8f99; box-shadow:none; }
+  @keyframes cnB { 50% { opacity:.25; } }
+  #oInvite { align-items:center; gap:8px; margin:4px 0; } #oLink { flex:1; font-size:12px; word-break:break-all; user-select:all; }
+  #rejoin { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:40; display:none; flex-direction:column; gap:6px; background:#141110; border:1px solid rgba(232,196,106,.5); border-radius:10px; padding:12px 14px; width:min(92vw,380px); }
+  #rejoin span { color:var(--dim); font-size:13px; } #rejoin .row { display:flex; gap:8px; } #rejoin .row button { flex:1; }
+  #catchup { position:fixed; inset:0; z-index:30; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(5,5,6,.78); pointer-events:none; }
+  #catchup b { font-size:20px; letter-spacing:.12em; } #catchup > span { color:var(--dim); }
+
+  /* ===================== TELEFON (yatay, dokunmatik) ===================== */
+  #rotate { display:none; position:fixed; inset:0; z-index:200; background:#0b0a09; color:var(--ink); flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:24px; }
+  #rotate .ph { width:58px; height:100px; border:3px solid #e8c46a; border-radius:12px; position:relative; animation:rot 2.2s ease-in-out infinite; }
+  #rotate .ph::after { content:''; position:absolute; left:50%; bottom:6px; width:10px; height:10px; margin-left:-5px; border-radius:50%; background:#e8c46a; }
+  #rotate b { font-size:20px; letter-spacing:.14em; } #rotate span { color:var(--dim); font-size:14px; max-width:280px; line-height:1.5; }
+  @keyframes rot { 0%,20% { transform:rotate(0); } 55%,100% { transform:rotate(-90deg); } }
+  @media (orientation:portrait) { body.phone #rotate { display:flex; } }
+  @media (prefers-reduced-motion: reduce) { #rotate .ph { animation:none; transform:rotate(-90deg); } }
+  #strip { display:none; }
+  body.phone #strip { position:absolute; left:50%; bottom:calc(8px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:4; gap:6px; pointer-events:auto; max-width:62vw; overflow-x:auto; padding:4px 6px; scrollbar-width:none; }
+  body.phone #strip.on { display:flex; }
+  #strip button { flex:none; width:42px; height:62px; min-height:0; padding:0; border-radius:6px; font-size:11px; line-height:1.1; display:flex; align-items:center; justify-content:center; text-transform:none; letter-spacing:0; }
+  #strip.back button { background:repeating-linear-gradient(45deg,#5a1414 0 6px,#7a1c1c 6px 12px); border:2px solid #e8dcc0; color:#f2e8d2; font-weight:800; font-size:15px; }
+  #strip.back button.hov { transform:translateY(-8px); box-shadow:0 0 0 2px #e8c46a; }
+  #strip.face button { width:52px; font-size:10px; hyphens:auto; word-break:normal; background:#efe6d2; color:#1a1612; border:2px solid #c9bfa8; font-weight:700; word-break:break-word; padding:2px; }
+  #strip.face button.m { color:#b0201a; } #strip.face button.off { transform:translateY(-10px); border-color:#e8c46a; box-shadow:0 0 0 2px #e8c46a; }
+  #strip .lab { position:absolute; left:50%; top:-18px; transform:translateX(-50%); font-size:11px; color:var(--dim); white-space:nowrap; text-shadow:0 1px 3px #000; }
+  @media (orientation:landscape) {
+    /* menü: solda dosya, sağda düğmeler; ikisi de kendi içinde kayar */
+    body.phone #menu { padding:max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left)); }
+    body.phone #menu .desk { display:grid !important; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:10px; height:calc(100vh - 12px); height:calc(100dvh - 12px); align-items:stretch; max-width:none; width:100%; }
+    body.phone #menu .page { overflow-y:auto; padding:8px 12px; max-height:100%; transform:none; }
+    body.phone #menu .page h1, body.phone #menu .logo { font-size:30px; }
+    body.phone #menu .tag, body.phone #menu #stats { display:none; }
+    body.phone #menu .mugs { grid-template-columns:repeat(6,1fr); gap:4px; max-width:none; padding:0; margin-top:4px; }
+    body.phone #menu .mug { font-size:8.5px; } body.phone #menu .minfo { font-size:11px; min-height:0; }
+    body.phone #menu .opts { grid-template-columns:repeat(3,1fr); gap:4px 8px; margin-top:4px; }
+    body.phone #menu select { min-height:34px; font-size:13px; }
+    body.phone #menu .tabs { overflow-y:auto; max-height:100%; display:flex; flex-direction:column; gap:6px; margin:0; padding:0 2px 6px; }
+    body.phone #menu .tabs button, body.phone #menu .tabs #play { width:100%; min-height:44px; padding:8px 12px; border-radius:8px; }
+    body.phone #menu .tabs #play { min-height:52px; font-size:16px; }
+    body.phone #menu .tabs button small { display:none; }
+    body.phone #menu .links { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+    body.phone #menu .links button { min-height:38px; font-size:11px; padding:4px; }
+    body.phone .panel .box { max-height:calc(100dvh - 16px); overflow-y:auto; width:min(94vw,640px); padding:12px 16px; }
+    /* oyun içi: üst köşeler bilgi, alt sağ başparmak düğmeleri, alt sol yazılar */
+    body.phone #top { top:max(6px, env(safe-area-inset-top)); left:max(8px, env(safe-area-inset-left)); gap:4px; }
+    body.phone #top button { min-height:38px; min-width:38px; padding:6px 10px; font-size:12px; }
+    body.phone #status { top:50px; left:max(8px, env(safe-area-inset-left)); transform:scale(.88); transform-origin:top left; }
+    body.phone #round { top:max(6px, env(safe-area-inset-top)); right:max(8px, env(safe-area-inset-right)); font-size:10.5px; padding:4px 8px; line-height:1.45; }
+    body.phone #bottom { left:auto; right:max(10px, env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); transform:none; width:auto; max-width:40vw; align-items:flex-end; gap:6px; }
+    body.phone #prompt { position:fixed; left:max(10px, env(safe-area-inset-left)); bottom:calc(10px + env(safe-area-inset-bottom)); max-width:34vw; text-align:left; font-size:12.5px; line-height:1.35; }
+    body.phone.stripOn #prompt { bottom:calc(84px + env(safe-area-inset-bottom)); max-width:30vw; }
+    body.phone #actions { flex-direction:column; align-items:stretch; gap:6px; }
+    body.phone #actions button { min-height:46px; min-width:150px; padding:8px 14px; font-size:13px; }
+    body.phone #coach { left:50%; top:max(44px, env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-6px); width:min(44vw,380px); font-size:11.5px; line-height:1.38; padding:6px 9px; }
+    body.phone #coach.show { transform:translate(-50%,0); }
+    body.phone #subs { top:16%; font-size:13px; max-width:56vw; }
+    body.phone #toast { font-size:12.5px; max-width:56vw; }
+    body.phone .tag3d { font-size:10px; } body.phone .tag3d .s { font-size:9.5px; }
+    body.phone #kozb { top:8px; width:min(50vw,380px); } body.phone #kozb img { width:36px; height:36px; } body.phone #kozb em { font-size:11px; }
+    body.phone #lobby { top:max(6px, env(safe-area-inset-top)); } body.phone #lobby span { display:none; }
+    body.phone #role { padding:8px; flex-direction:row; flex-wrap:wrap; align-content:flex-start; }
+    body.phone .rc { width:min(96vw,760px); display:grid; grid-template-columns:1fr 1fr; gap:0 12px; font-size:12px; padding:10px 12px; }
+    body.phone .rc .top { grid-column:1 / -1; margin-bottom:2px; } body.phone .rc .top img { width:48px; height:48px; } body.phone .rc .top b { font-size:22px; }
+    body.phone .rc .riv { grid-column:2; grid-row:2 / span 2; } body.phone .rc .foot { grid-column:1 / -1; }
+    body.phone #role > button { position:fixed; right:max(12px, env(safe-area-inset-right)); bottom:calc(10px + env(safe-area-inset-bottom)); min-width:0; width:auto; margin:0; padding:10px 18px; box-shadow:0 6px 20px rgba(0,0,0,.6); z-index:23; }
+    body.phone .rc .foot { display:none; } body.phone .rc { margin-bottom:56px; } body.phone .rc .how { font-size:11.5px; }
+    body.phone #joy { width:110px; height:110px; }
+  }
+  #rsum { position:absolute; right:max(14px, env(safe-area-inset-right)); top:140px; width:min(46vw,360px); background:rgba(14,12,10,.94); border:1px solid rgba(232,196,106,.45); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.45; opacity:0; transform:translateX(12px); transition:opacity .3s, transform .3s; pointer-events:none; z-index:6; }
+  #rsum.show { opacity:1; transform:none; pointer-events:auto; cursor:pointer; }
+  #rsum .h { display:block; color:#e8c46a; letter-spacing:.18em; font-size:11px; margin-bottom:4px; } #rsum p { margin:4px 0 0; color:var(--dim); } #rsum p b { color:var(--ink); }
+  #rsum .path small { display:block; font-size:10px; letter-spacing:.2em; color:var(--dim); } #rsum .path { color:var(--ink); } #rsum .ar { color:#e8c46a; margin:0 3px; } #rsum .path i { font-style:normal; font-size:10.5px; color:#e8c46a; margin-left:3px; }
+  body.phone #rsum { top:44px; width:min(40vw,320px); font-size:11.5px; }
+  @media (prefers-reduced-motion: reduce) { #rsum { transition:opacity .2s; transform:none; } }
 </style>
 </head>
 <body>
@@ -294,6 +384,8 @@
   <div id="trig" role="button" aria-label="Tetiği çek: basılı tut"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="48" class="b"/><circle cx="55" cy="55" r="48" class="p"/></svg><b>TETİK</b><small>basılı tut</small></div>
   <div id="lobby" role="timer" aria-live="off"><div><small data-en="TABLE OPENS IN">MASA KURULUYOR</small><span data-en="Walk, sit, punch · Left click / F: punch · Space: table">Gez, otur, yumruk at · Sol tık / F: yumruk · Boşluk: masa</span></div><b id="lobT">30</b></div>
   <div id="coach" role="status" aria-live="polite"></div>
+  <div id="strip" aria-label="Kartlar"></div>
+  <div id="rsum" role="status" aria-live="polite"></div>
   <div id="kozb" role="status" aria-live="polite"></div>
   <div id="bottom"><div id="prompt"></div><div id="actions"></div></div>
   <div id="joy"><i></i></div>
@@ -326,6 +418,9 @@
   <button id="bHelpX" data-en="Close">Kapat</button>
 </div></div>
 
+<div id="rotate" role="alert"><div class="ph"></div><b data-en="TURN YOUR PHONE">TELEFONU YAN ÇEVİR</b><span data-en="MUHBİR is played in landscape. Turn your phone sideways.">MUHBİR yatay oynanır. Telefonunu yan çevir.</span></div>
+<div id="rejoin" role="dialog" aria-label="Yarım kalan oyun"></div>
+<div id="catchup" role="status"><b data-en="Catching up with the game…">Oyuna yetişiliyor…</b><span><span id="catchupN">0</span> <span data-en="moves left">hamle kaldı</span></span></div>
 <div id="role" role="dialog" aria-modal="true" aria-label="Bu oyunda sen"></div>
 <div id="ff" class="layer" data-en="Skipping tutorial…">Öğretici geçiliyor…</div>
 <div id="night"></div>
@@ -342,6 +437,7 @@
       <div id="mugInfo" class="minfo" aria-live="polite"></div>
       <div class="tag" data-en="INTERNAL NOTE: one of the crew works for us. Nobody at the table knows who. Whoever is left holding that card pays for it.">İÇ NOT: Ekipten biri bize çalışıyor. Kim olduğunu masadakiler bilmiyor. O kart kimin elinde kalırsa bedelini o öder.</div>
       <div id="daily" class="daily"></div>
+      <div id="weekly" class="daily wk"></div>
       <div class="opts">
         <label><span data-en="Game">Oyun</span><select id="gsimple"><option value="1" data-en="Simple (recommended)">Sade (önerilen)</option><option value="0" data-en="Full: bets, missions, questioning, venue rules">Tam: bahis, görev, sorgu, mekân kuralı</option></select></label>
         <label><span data-en="Mode">Mod</span><select id="gmode"><option value="fast" data-en="Fast">Hızlı</option><option value="classic" data-en="Classic">Klasik</option><option value="dark" data-en="Dark">Karanlık</option><option value="mole" data-en="Mole (you are the informant)">Köstebek (muhbir sensin)</option><option value="iki" data-en="Two informants (5 players)">İki muhbir (5 kişi)</option></select></label>
@@ -361,7 +457,7 @@
       <button id="bGuide"><span data-en="Character guide">Karakter öğreticisi</span><small data-en="who does what">kim ne yapar</small></button>
       <button id="bChar"><span data-en="Characters">Karakterler</span><small data-en="masks, gloves, gun">maske, eldiven, tabanca</small></button>
       <nav class="links">
-        <button id="bStory" data-en="Story">Hikâye</button><button id="bHow" data-en="Rules">Kurallar</button><button id="bProf" data-en="Profile">Profil</button><button id="bCrew" data-en="Crew">Ekip</button><button id="bDeco" data-en="Garage">Garaj</button><button id="bSet" data-en="Settings">Ayarlar</button>
+        <button id="bStory" data-en="Story">Hikâye</button><button id="bHow" data-en="Rules">Kurallar</button><button id="bLb" data-en="Ranking">Sıralama</button><button id="bProf" data-en="Profile">Profil</button><button id="bCrew" data-en="Crew">Ekip</button><button id="bDeco" data-en="Garage">Garaj</button><button id="bSet" data-en="Settings">Ayarlar</button>
       </nav>
     </div>
   </div>
@@ -374,7 +470,7 @@
   <label class="oname"><span data-en="Your name (everyone sees it)">Adın (herkes görür)</span><input type="text" id="oName" maxlength="12" autocomplete="nickname" placeholder="Adını yaz" data-en-ph="Type your name"></label>
   <p class="dim" data-en="Create a room and send the 4-letter code to your friends; they open the same link and join with the code. Up to 5 players; empty seats are filled by bots.">Oda kur, 4 harfli kodu arkadaşlarına gönder; aynı linki açıp kodla katılsınlar. En fazla 5 kişi; boş koltuklara bot oturur.</p>
   <div id="onA"><div class="row"><button id="oHost" class="red" data-en="Create room">Oda kur</button><span class="dim" data-en="or">ya da</span><input type="text" id="oCode" maxlength="4" placeholder="KOD" autocomplete="off" aria-label="Oda kodu"><button id="oJoin" data-en="Join">Katıl</button><button id="oWatch" data-en="Watch">İzle</button></div></div>
-  <div id="onB" style="display:none"><div id="oTitle"></div><ol id="oList"></ol><div class="row"><button id="oStart" class="red" data-en="Start">Başlat</button><button id="oLeave" data-en="Leave">Ayrıl</button></div></div>
+  <div id="onB" style="display:none"><div id="oTitle"></div><div id="oInvite" class="row"><span id="oLink" class="dim"></span><button id="oShare" data-en="Share link">Linki paylaş</button></div><ol id="oList"></ol><div class="row"><button id="oStart" class="red" data-en="Start">Başlat</button><button id="oLeave" data-en="Leave">Ayrıl</button></div></div>
   <div id="oMsg" class="dim"></div>
   <button class="x" data-en="Close">Kapat</button>
 </div></div>
@@ -416,6 +512,16 @@
   <b data-en="CREW">EKİP</b>
   <span class="dim" data-en="Bring one person to the table. Applies in single-player games (not the daily heist or the table of the week). Story nights you win unlock one for free.">Masaya yanında birini getir. Tek kişilik oyunlarda geçerli (günün soygunu ve haftanın masası hariç). Hikâyede kazandığın her gece birini bedavaya açar.</span>
   <div id="crewList" class="shop"></div>
+  <button class="x" data-en="Close">Kapat</button>
+</div></div>
+<div id="pLb" class="panel layer"><div class="box lbox">
+  <b data-en="FRIENDS RANKING">ARKADAŞ SIRALAMASI</b>
+  <div id="lbWeek" class="wkbox"></div>
+  <div class="row seg"><button id="lbAll" class="on" data-en="All time">Tüm zamanlar</button><button id="lbWk" data-en="This week">Bu hafta</button></div>
+  <div class="lbwrap"><table id="lbTab"></table></div>
+  <p id="lbMsg" class="dim"></p>
+  <div class="row"><span class="dim" data-en="Your crew:">Ekibin:</span><b id="lbCode" class="code">—</b><button id="lbShare" data-en="Invite link">Davet linki</button><button id="lbNew" data-en="New crew">Yeni ekip</button></div>
+  <div class="row"><input type="text" id="lbIn" maxlength="8" placeholder="EKİP KODU" data-en-ph="CREW CODE" autocomplete="off" aria-label="Ekip kodu"><button id="lbJoin" data-en="Join crew">Ekibe katıl</button></div>
   <button class="x" data-en="Close">Kapat</button>
 </div></div>
 <div id="pDeco" class="panel layer"><div class="box">
@@ -460,6 +566,6 @@
   <div class="row"><button id="ctxGuide" data-en="Character guide">Karakter rehberi</button><button id="ctxRules" data-en="All rules">Tüm kurallar</button></div>
   <button class="x red" data-en="Back to the game">Oyuna dön</button>
 </div></div>
-<script src="./game.js?v=88e82d1d"></script>
+<script src="./game.js?v=13c855bc"></script>
 </body>
 </html>
